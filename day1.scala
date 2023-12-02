@@ -2,7 +2,7 @@
 import scala.util.matching.Regex
 import scala.util.Try
 
-val replacements = Map(
+val wordsToNumsMap = Map(
   "one"   -> "1e",
   "two"   -> "2o",
   "three" -> "3e",
@@ -13,14 +13,10 @@ val replacements = Map(
   "eight" -> "8t",
   "nine"  -> "9e"
 )
-val replaceWordsWithNumsRegex: Regex = replacements.keys.mkString("|").r
+val wordsToNumsRegex: Regex = wordsToNumsMap.keys.mkString("|").r
 
 def wordsToNums(line: String): String =
-  if replaceWordsWithNumsRegex.findFirstIn(line).isEmpty then line
-  else
-    wordsToNums(
-      replaceWordsWithNumsRegex.replaceAllIn(line, m => replacements(m.matched))
-    )
+  wordsToNumsRegex.replaceAllIn(line, m => wordsToNumsMap(m.matched))
 
 def firstAndLastDigit(line: String): Int =
   val digits = line.filter(_.isDigit)
@@ -38,5 +34,5 @@ def linesFromFile(filename: String): Array[String] =
   println(s"day1 part1: ${lines.map(firstAndLastDigit).sum}")
 
   println(
-    s"day1 part2: ${lines.map(wordsToNums).map(firstAndLastDigit).sum}"
+    s"day1 part2: ${lines.map(wordsToNums).map(wordsToNums).map(firstAndLastDigit).sum}"
   )
