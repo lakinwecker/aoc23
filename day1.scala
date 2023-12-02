@@ -18,11 +18,11 @@ val wordsToNumsRegex: Regex = wordsToNumsMap.keys.mkString("|").r
 def wordsToNums(line: String): String =
   wordsToNumsRegex.replaceAllIn(line, m => wordsToNumsMap(m.matched))
 
-def firstAndLastDigit(line: String): Int =
-  val digits = line.filter(_.isDigit)
-  val first  = digits.headOption.getOrElse('0')
-  val last   = digits.lastOption.getOrElse(first)
-  return s"${first}${last}".toInt
+def firstAndLastOption[A](seq: Seq[A]): Option[Tuple2[A, A]] =
+  seq.headOption.flatMap(f => seq.lastOption.map(l => (f, l)))
+
+def solveLine(line: String): Option[Int] =
+  firstAndLastOption(line.filter(_.isDigit)).map((f, l) => s"${f}${l}".toInt)
 
 def linesFromFile(filename: String): Array[String] =
   val source = scala.io.Source.fromFile(filename)
@@ -31,8 +31,8 @@ def linesFromFile(filename: String): Array[String] =
 
 @main def main(filename: String) =
   val lines = linesFromFile(filename)
-  println(s"day1 part1: ${lines.map(firstAndLastDigit).sum}")
+  println(s"day1 part1: ${lines.flatMap(solveLine).sum}")
 
   println(
-    s"day1 part2: ${lines.map(wordsToNums).map(wordsToNums).map(firstAndLastDigit).sum}"
+    s"day1 part2: ${lines.map(wordsToNums.compose(wordsToNums)).flatMap(solveLine).sum}"
   )
